@@ -1,0 +1,125 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - aspen
+scope: source.aspen
+contexts:
+  main:
+
+    - match: '#'
+      scope: punctuation.definition.comment.aspen
+      push: line_comment
+
+    - match: '^(default|default_attribute|reciprocal)\s'
+      scope: keyword.control.aspen
+
+    - match: '^(match)'
+      scope: keyword.control.aspen
+      push: aspen_match_block
+
+    - match: '\('
+      scope: punctuation.definition.node.begin.aspen
+      push: simple_node_content
+
+    - match: '\['
+      scope: punctuation.definition.edge.begin.aspen
+      push: simple_edge_content
+
+      # Strings begin and end with quotes, and use backslashes
+      # as an escape character
+    - match: '"'
+      scope: punctuation.definition.string.begin
+      push: double_quoted_string
+
+      # Numbers
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric
+
+    - match: \(
+      push: brackets
+
+    - match: \)
+      scope: invalid.illegal.stray-bracket-end
+
+
+  simple_node_content:
+    - meta_content_scope: variable.other.identifier.node.aspen
+    - match: '\)'
+      scope: punctuation.definition.node.end.aspen
+      pop: true
+
+  simple_edge_content:
+    - meta_content_scope: entity.name.class.relationship-type.aspen
+    - match: '\]'
+      scope: punctuation.definition.edge.end.aspen
+      pop: true
+
+  aspen_match_block:
+
+    # - meta_content_scope: string.unquoted.aspen
+
+    - match: '\('
+      push: aspen_matcher
+
+    - match: '^(to)'
+      scope: keyword.control.aspen
+      set: aspen_match_template
+
+  aspen_matcher:
+
+    - match: '(numeric|string)'
+      scope: storage.type.aspen
+
+    - match: '[A-Z]{1}[a-zA-Z]+'
+      scope: storage.label.aspen
+
+    - match: ' [a-z_]+'
+      scope: variable.other.identifier.aspen
+
+    - match: '\)'
+      pop: true
+
+  aspen_match_template:
+
+    - match: '(\{{2,3})'
+      scope: punctuation.definition.tag.begin.aspen
+      push: mustache_tag_key
+
+    - match: '\[:\w+\]'
+      scope: entity.name.class.relationship-type.cypher
+
+    - match: '->|<-'
+      scope: support.function.relationship-pattern-end.cypher
+
+    - match: '-'
+      scope: support.function.relationship-pattern-start.cypher
+
+    - match: '^(end)'
+      scope: keyword.control.aspen
+      pop: true
+
+  mustache_tag_key:
+
+    - meta_scope: variable.other.tag-key.aspen
+    - match: '(\}{2,3})'
+      scope: punctuation.definition.tag.end.aspen
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.aspen
+    - match: $
+      pop: true
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double
+    - match: '\\.'
+      scope: constant.character.escape
+    - match: '"'
+      scope: punctuation.definition.string.end
+      pop: true
+
+  brackets:
+    - match: \)
+      pop: true
+    - include: main

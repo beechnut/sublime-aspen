@@ -1,0 +1,57 @@
+// SYNTAX TEST "Packages/User/Aspen.sublime-syntax"
+
+default Person, name
+// ^ keyword.control
+
+default_attribute Employer, name
+// ^ keyword.control
+
+reciprocal knows, is friends with
+// ^ keyword.control
+
+
+match
+// ^ keyword.control
+
+  (Person a) donated $(numeric dollar_amount) to (Person b).
+  // ^ storage.label
+  //      ^ variable.other.identifier
+  //                   ^ storage.type
+  //                           ^ variable.other.identifier
+  //                                               ^ storage.label
+  //                                                     ^ variable.other.identifier
+
+  (Person a) gave (Person b) $(string dollar_amount).
+  //                           ^ storage.type
+  //                                  ^ variable.other.identifier
+
+  (Person a) gave a $(numeric dollar_amount) donation to (Person b).
+to
+// <- keyword.control
+  {{{a}}}-[:GAVE_DONATION]->(:Donation { amount: {{{dollar_amount}}} })<-[:RECEIVED_DONATION]-{{{b}}}
+  // <- punctuation.definition.tag.begin
+  // ^ variable.other.tag-key
+  //  ^^^ punctuation.definition.tag.end
+  //       ^^ entity.name.class.relationship-type.cypher
+  //                                             ^ punctuation.definition.tag.begin
+  //                                                ^ variable.other.tag-key
+end
+
+Sarah donated $30 to Sumbul.
+// <- source.aspen
+
+(Matt) [voted for] (Person { name: "Sumbul" }).
+// <- punctuation.definition.node.begin
+// ^ variable.other.identifier.node
+//   ^ punctuation.definition.node.end
+
+(Sarah) [knows] (Hélène).
+//      ^ punctuation.definition.edge.begin
+//       ^^^^^ entity.name.class.relationship-type
+//            ^ punctuation.definition.edge.end
+
+
+# foo
+// ^ comment.line
+// <- punctuation.definition.comment
+
